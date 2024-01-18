@@ -2,240 +2,253 @@ from langchain.prompts import HumanMessagePromptTemplate
 
 SEED_QUESTION = HumanMessagePromptTemplate.from_template(
     """
-Generate two questions from given context satisfying the rules given below:
-    2.The question should be framed such that it must be clearly understood without providing context.
-    3.The question should be fully answerable from information present in given context.
+Используя предосталвенный контекст, сгенерируй два вопроса, удовлетворяющих следующим условиям:
+    1. Вопрос должен быть сформулирован так, чтобы он был понятен без знания контекста;
+    2. Информации из контекста достаточно для ответа на вопрос.
     
-
 {demonstration}
 
 
-Context:
+Контекст:
 {context}
-Questions:"""  # noqa: E501
+Вопросы:"""  # noqa: E501
 )
 
 TABLE_QA = HumanMessagePromptTemplate.from_template(
     """
-Frame a question from the given table following the rules given below
-    - Do no use phrases like 'provided context','provided table' etc in the question
-    
-Context:
-Table 2: Local Library Statistics
+Из предоставленной таблицы 2 "Статистика местной библиотеки" сформируй вопрос, следуя приведенным ниже правилам
+— Не используйте фразы вроде "предоставленный контекст", "предоставленная таблица" и т.д. в вопросе
 
-Month	New Memberships	Books Loaned	eBooks Downloaded
-January	150	1200	950
-February	120	1100	1000
-March	200	1400	1100
+Контекст:
+Таблица 2: Местная библиотека Статистика
 
-Framed Question from Table: How many books were loaned in January?
+Месяц	Новые членства	Книги, взятые напрокат	Скачанные электронные книги
+Январь	150	1200	950
+Февраль	120	1100	1000
+Март	200	1400	1100
 
-Context:
+Сформулированный вопрос на основе таблицы: Сколько книг было взято напрокат в январе?
+
+Контекст:
 {context}
 
-Framed Question from Table:"""  # noqa: E501
+Сформулированный вопрос на основе таблицы:"""  # noqa: E501
 )
 
 
 REASONING_QUESTION = HumanMessagePromptTemplate.from_template(
     """\
-Complicate the given question by rewriting question into a multi-hop reasoning question based on the provided context. 
-Answering the question should require the reader to make multiple logical connections or inferences using the information available in given context. 
-Rules to follow when rewriting question:
-1. Ensure that the rewritten question can be answered entirely from the information present in the contexts.
-2. Do not frame questions that contains more than 15 words. Use abbreviation wherever possible.
-3. Make sure the question is clear and unambiguous. 
-4. phrases like 'based on the provided context','according to the context',etc are not allowed to appear in the question.
+Усложни исходный вопрос посредством переформулировки в его в cложный вопрос c многоэтапным рассуждением
+Ответ на вопрос должен требовать от читателя сделать несколько логических выводов или умозаключений, используя информацию, содержащуюся в предоставленном контексте. 
+Правила, которые необходимо соблюдать при переформулировке вопроса:
 
-Initial Question:
-What is the capital of France?
+1. На переформулированный вопрос можно полностью ответить, используя только информацию, содержащуюся в контексте;
+2. Вопрос не должен содержать более 15 слов. Используй сокращения везде, где это возможно;
+3. Убедись, что вопрос ясен и недвусмыслен;
+4. Фразы типа "на основе предоставленного контекста", "в соответствии с контекстом" и т. д. не допускаются в вопросе.
 
-Given Context:
-France is a country in Western Europe. It has several cities, including Paris, Lyon, and Marseille. Paris is not only known for its cultural landmarks like the Eiffel Tower and the Louvre Museum but also as the administrative center.
+Исходный вопрос:
+Что является столицей Франции?
 
-Complicated Multi-Hop Question:
-Linking the Eiffel Tower and administrative center, which city stands as both?
+Предоставленный контекст:
+Франция - страна в Западной Европе. В ней есть несколько городов, включая Париж, Лион и Марсель. Париж известен не только своими культурными достопримечательностями, такими как Эйфелева башня и Лувр, но и как административный центр.
 
-Initial Question:
-What does the append() method do in Python?
+Сложный вопрос с многоэтапным рассуждением:
+Какой город является как культурным центром, так и административным центром?
 
-Given Context:
-In Python, lists are used to store multiple items in a single variable. Lists are one of 4 built-in data types used to store collections of data. The append() method adds a single item to the end of a list.
+Исходный вопрос:
+Что делает метод append() в Python?
 
-Complicated Multi-Hop Question:
-If a list represents a variable collection, what method extends it by one item?
+Предоставленный контекст:
+В Python списки используются для хранения нескольких элементов в одной переменной. Списки - это один из 4 встроенных типов данных, используемых для хранения коллекций данных. Метод append() добавляет один элемент в конец списка.
 
-Initial Question: 
+Сложный вопрос с многоэтапным рассуждением:
+Если список представляет собой переменную, содержащую коллекцию, то какой метод расширяет ее на один элемент?"
+
+Исходный вопрос:
 {question}
-Given Context:
+Предоставленный контекст:
 {context}
 
-Complicated Multi-Hop Question
+Сложный вопрос с многоэтапным рассуждением:
 """  # noqa: E501
 )
 
 MULTICONTEXT_QUESTION = HumanMessagePromptTemplate.from_template(
     """\
-The task is to rewrite and complicate the given question in a way that answering it requires information derived from both context1 and context2. 
-Follow the rules given below while rewriting the question.
-    1. The rewritten question should not be very long. Use abbreviation wherever possible.
-    2. The rewritten question must be reasonable and must be understood and responded by humans.
-    3. The rewritten question must be fully answerable from information present in context1 and context2. 
-    4. Read and understand both contexts and rewrite the question so that answering requires insight from both context1 and context2.
-    5. phrases like 'based on the provided context','according to the context?',etc are not allowed to appear in the question.
+Твоя задача заключается в переформулировке и усложнении данного вопроса таким образом, чтобы ответ на него требовал информации, полученной из обоих контекстов. При переформулировке вопроса необходимо следовать следующим правилам:
+1. Переформулированный вопрос не должен быть очень длинным. Следует использовать сокращения везде, где это возможно.
+2. Переформулированный вопрос должен быть разумным и понятным для людей.
+3. Переформулированный вопрос должен быть полностью ответим на основе информации, содержащейся в контексте 1 и контексте 2.
+4. Прочитайте и поймите оба контекста, а затем переформулируйте вопрос таким образом, чтобы ответ требовал понимания обоих контекстов.
+5. Фразы типа "на основе предоставленного контекста", "в соответствии с контекстом" и т. д. не допускаются в вопросе.
 
-Initial Question:
-What process turns plants green?
+Исходный вопрос:
+Какой процесс придает растениям зеленый цвет?
 
-Context1:
-Chlorophyll is the pigment that gives plants their green color and helps them photosynthesize.
+Контекст 1:
+Хлорофилл - пигмент, который придает растениям зеленый цвет и помогает им осуществлять фотосинтез.
 
-Context2:
-Photosynthesis in plants typically occurs in the leaves where chloroplasts are concentrated.
+Контекст 2:
+Фотосинтез у растений обычно происходит в листьях, где находятся хлоропласты.
 
-Complicated Multi-Hop Question:
-In which plant structures does the pigment responsible for their verdancy facilitate energy production?
+Сложный вопрос с многоэтапным рассуждением:
+В каких структурах растений пигмент, отвечающий за их зеленый цвет, способствует процессу производства энергии?
 
-Initial Question:
-How do you calculate the area of a rectangle?
+Исходный вопрос:
+Как рассчитать площадь прямоугольника?
 
-Context1:
-The area of a shape is calculated based on the shape's dimensions. For rectangles, this involves multiplying the length and width.
+Контекст 1:
+Площадь фигуры рассчитывается на основе ее размеров. Для прямоугольников это означает умножение длины и ширины.
 
-Context2:
-Rectangles have four sides with opposite sides being equal in length. They are a type of quadrilateral.
+Контекст 2:
+Прямоугольники имеют четыре стороны, причем противоположные стороны равны по длине. Они являются типом четырехугольника.
 
-Complicated Multi-Hop Question:
-What multiplication involving equal opposites yields a quadrilateral's area?
+Сложный вопрос с многоэтапным рассуждением:
+Какое умножение, в котором участвуют равные противоположности, дает площадь четырехугольника?
 
-
-Initial Question:
+Исходный вопрос:
 {question}
-context1:
+Контекст 1:
 {context1}
-context2:
+Контекст 2:
 {context2}
-Complicated Multi-Hop Question:
+Сложный вопрос с многоэтапным рассуждением:
 """  # noqa: E501
 )
 
 
 CONDITIONAL_QUESTION = HumanMessagePromptTemplate.from_template(
     """\
-Rewrite the provided question to increase its complexity by introducing a conditional element.
-The goal is to make the question more intricate by incorporating a scenario or condition that affects the context of the question.
-Follow the rules given below while rewriting the question.
-    1. The rewritten question should not be longer than 25 words. Use abbreviation wherever possible.
-    2. The rewritten question must be reasonable and must be understood and responded by humans.
-    3. The rewritten question must be fully answerable from information present context.
-    4. phrases like 'provided context','according to the context?',etc are not allowed to appear in the question.
+Твоя задача заключается в усложнении предоставленного вопроса путем введения условного элемента. Цель состоит в том, чтобы сделать вопрос более сложным, включив в него сценарий или условие, которое влияет на контекст вопроса. При переформулировке вопроса необходимо следовать следующим правилам:
+1. Переформулированный вопрос не должен быть длиннее 25 слов. Следует использовать сокращения везде, где это возможно.
+2. Переформулированный вопрос должен быть разумным и понятным для людей.
+3. Переформулированный вопрос должен быть полностью ответим на основе информации, содержащейся в контексте.
+4. Фразы типа "предоставленный контекст", "в соответствии с контекстом" и т. д. не допускаются в вопросе.
 
-Initial Question:
-What is the function of the roots of a plant?
+Исходный вопрос:
+Какую функцию выполняют корни растения?
 
-Context:
-The roots of a plant absorb water and nutrients from the soil, anchor the plant in the ground, and store food.
+Контекст:
+Корни растения поглощают воду и питательные вещества из почвы, закрепляют растение в земле и хранят пищу.
 
-Rewritten Question:
-What dual purpose do plant roots serve concerning soil nutrients and stability?
+Переформулированный вопрос с усложнением:
+Какую двойную функцию выполняют корни растений в отношении питательных веществ почвы и стабильности?
 
-Answer:
-Plant roots serve a dual purpose by absorbing water and nutrients from the soil, which is vital for the plant's growth, and providing stability by anchoring the plant in the ground.
+Ответ:
+Корни растений выполняют двойную функцию, поглощая воду и питательные вещества из почвы, что необходимо для роста растения, и обеспечивая стабильность, закрепляя растение в земле.
 
-Example 2:
+Пример 2:
 
-Initial Question:
-How do vaccines protect against diseases?
+Исходный вопрос:
+Как вакцины защищают от болезней?
 
-Context:
-Vaccines protect against diseases by stimulating the body's immune response to produce antibodies, which recognize and combat pathogens.
+Контекст:
+Вакцины защищают от болезней, стимулируя иммунную систему организма для производства антител, которые распознают и борются с патогенами.
 
-Rewritten Question:
-How do vaccines utilize the body's immune system to defend against pathogens?
+Переформулированный вопрос с усложнением:
+Как вакцины используют иммунную систему организма для защиты от патогенов?
 
-Initial Question::
+Исходный вопрос:
 {question}
-Context:
+Контекст:
 {context}
-Rewritten Question
+Переформулированный вопрос с усложнением:
 """  # noqa: E501
 )
 
 
 COMPRESS_QUESTION = HumanMessagePromptTemplate.from_template(
     """\
-Rewrite the following question to make it more indirect and shorter while retaining the essence of the original question. 
-The goal is to create a question that conveys the same meaning but in a less direct manner. The rewritten question should shorter so use abbreviation wherever possible.
+Задача заключается в переформулировке исходного вопроса таким образом, чтобы он был более косвенным и коротким, но при этом сохранял суть исходного вопроса. 
+Цель состоит в том, чтобы сформулировать вопрос таким образом, чтобы он передавал ту же информацию, но в менее прямой форме. 
+Переформулированный вопрос должен быть короче, поэтому везде, где это возможно, следует использовать сокращения.
 
-Original Question:
-What is the distance between the Earth and the Moon?
+Исходный вопрос:
+Каково расстояние между Землей и Луной?
 
-Rewritten Question:
-How far is the Moon from Earth?
+Переформулированный вопрос:
+Насколько далеко находится Луна от Земли?
 
-Original Question:
-What ingredients are required to bake a chocolate cake?
+Исходный вопрос:
+Какие ингредиенты требуются для выпечки шоколадного торта?
 
-Rewritten Question:
-What's needed for a chocolate cake?
+Переформулированный вопрос:
+Что требуется для приготовления шоколадного торта?
 
-Original Question:
+Исходный вопрос:
 {question}
-Rewritten Question:
+Переформулированный вопрос:
 """  # noqa: E501
 )
 
 
 CONVERSATION_QUESTION = HumanMessagePromptTemplate.from_template(
     """\
-Reformat the provided question into two separate questions as if it were to be part of a conversation. Each question should focus on a specific aspect or subtopic related to the original question.
-question: What are the advantages and disadvantages of remote work?
-Reformatted Questions for Conversation: What are the benefits of remote work?\nOn the flip side, what challenges are encountered when working remotely?
-question:{question}
+Твоя задача заключается в разделении исходного вопроса на два отдельных вопроса, как если бы они были частью разговора. 
+Каждый вопрос должен фокусироваться на конкретном аспекте или подтеме, связанной с исходным вопросом. 
+Переформулированные вопросы должны быть короче, поэтому везде, где это возможно, следует использовать сокращения.
 
-Reformatted Questions for Conversation:
+Исходный вопрос:
+Каковы преимущества и недостатки удаленной работы?
+
+Переформулированные вопросы для разговора:
+Каковы преимущества удаленной работы?\nС другой стороны, с какими проблемами сталкиваются при удаленной работе?
+
+Исходный вопрос:
+{question}
+Переформулированные вопросы для разговора:
 """  # noqa: E501
 )
 
 SCORE_CONTEXT = HumanMessagePromptTemplate.from_template(
-    """Given a context, complete the two following tasks and output answer valid json format 
-1.Evaluate the provided context and assign a numerical score between 0 and 10 based on the following criteria:
-    - Award a high score to context that thoroughly delves into and explains concepts.
-    - Assign a lower score to context that contains excessive references, acknowledgments, personal information, or other non-essential elements.
-2.Check if context contains tables
-Context:
-Albert Einstein (/ˈaɪnstaɪn/ EYEN-styne;[4] German: [ˈalbɛɐt ˈʔaɪnʃtaɪn] ⓘ; 14 March 1879 – 18 April 1955) was a German-born theoretical physicist who is widely held to be one of the greatest and most influential scientists of all time.
-Output:
+    """Задача заключается в выполнении двух задач на основе предоставленного контекста и выводе ответа в формате JSON.
+
+1. Оцените предоставленный контекст и присвойте числовую оценку от 0 до 10 на основе следующих критериев:
+    - Выдайте высокую оценку контексту, который тщательно исследует и объясняет концепции.
+    - Присвойте более низкую оценку контексту, который содержит избыточные ссылки, признания, личную информацию или другие несущественные элементы.
+
+2. Проверьте, содержит ли контекст таблицы.
+
+Предоставленный контекст:
+Альберт Эйнштейн (14 марта 1879 г. – 18 апреля 1955 г.) был немецко-родившимся теоретическим физиком, которого широко считают одним из величайших и наиболее влиятельных ученых всех времен.
+
+Выходные данные:
 {{"score":6.0, "is_table_present":false}}
-Context:
+
+Предоставленный контекст:
 {context}
-Output:"""  # noqa: E501
+
+Выходные данные:
+"""  # noqa: E501
 )
 
 REWRITE_QUESTION = HumanMessagePromptTemplate.from_template(
     """\
-Given a context, transform the given question to be clear and standalone by replacing its coreferences with specific details from the context:
+Задача заключается в переформулировке исходного вопроса таким образом, чтобы он был более ясным и самостоятельным, заменяя его ссылки на конкретные детали из контекста. 
+Цель состоит в том, чтобы сформулировать вопрос таким образом, чтобы он мог стоять самостоятельно и требовал ответа, основанного на информации, содержащейся в контексте.
 
-Contexts:
-The Eiffel Tower was constructed using iron and was originally intended as a temporary exhibit for the 1889 World's Fair held in Paris.
-Despite its initial temporary purpose, the Eiffel Tower quickly became a symbol of Parisian ingenuity and an iconic landmark of the city, attracting millions of visitors each year
-The tower's design, created by Gustave Eiffel, was initially met with criticism from some French artists and intellectuals, but it has since been celebrated as a masterpiece of structural engineering and architectural design.
-Question:
-Who created the design for the Tower?
-Rewritten question:
-Who created the design for the Eiffel Tower?
+Контексты:
+Эйфелева башня была построена из железа и изначально задумана как временная выставка на Всемирной выставке 1889 года в Париже.
+Несмотря на свое первоначальное временное предназначение, Эйфелева башня быстро стала символом парижской изобретательности и иконой города, привлекая миллионы посетителей каждый год.
+Дизайн башни, созданный Густавом Эйфелем, изначально был встречен критикой со стороны некоторых французских художников и интеллектуалов, но с тех пор он был отмечен как шедевр структурного инжиниринга и архитектурного дизайна.
+Исходный вопрос:
+Кто создал дизайн башни?
+Переформулированный вопрос:
+Кто создал дизайн Эйфелевой башни?
 
-Contexts:
-'Exploring Zero-Shot Learning in Neural Networks' was published by Smith and Lee in 2021, focusing on the application of zero-shot learning techniques in artificial intelligence. 
-Question: 
-What datasets were used for the zero-shot evaluations in this study?
-Rewritten question:
-What datasets were used for the zero-shot evaluations Exploring Zero-Shot Learning in Neural Networks paper?
+Контексты:
+Исследование нулевого обучения в нейронных сетях' было опубликовано Смитом и Ли в 2021 году и сосредоточено на применении методов нулевого обучения в искусственном интеллекте.
+Исходный вопрос:
+Какие наборы данных использовались для нулевых оценок в этой статье?
+Переформулированный вопрос:
+Какие наборы данных использовались для нулевых оценок в статье "Исследование нулевого обучения в нейронных сетях"?
 
-
-Question:{question}
-Context: {context}
-Rewritten question:
+Контексты: 
+{context}
+Исходный вопрос:
+{question}
+Переформулированный вопрос:
 """
 )
 
@@ -243,100 +256,113 @@ FILTER_QUESTION = HumanMessagePromptTemplate.from_template(
     """\
 Classify given question
 
-question: What is the discovery about space?
+Вопрос: Что такое открытие о космосе?
 {{
-    "reason":"The question is too vague and does not specify which discovery about space it is referring to."
-    "verdit":"No"
+    "reason": "Вопрос слишком общий и не указывает, на какое открытие о космосе он ссылается."
+    "verdit": "Нет"
 }}
 
-question: What caused the Great Depression?
+Вопрос: Что стало причиной Великой депрессии?
 {{
-    "reason":"The question is specific and refers to a well-known historical economic event, making it clear and answerable.",
-    "verdict":"Yes"
+    "reason": "Вопрос конкретизирован и относится к хорошо известному историческому экономическому событию, что делает его понятным и отвечаемым.",
+    "verdict": "Да"
 }}
 
-question: What is the keyword that best describes the paper's focus in natural language understanding tasks?
+Вопрос: Какое ключевое слово лучше всего описывает фокус этой статьи на задаче обработки естественного языка? 
 {{
-  "reason": "The question mentions a 'paper' in it without referring it's name which makes it unclear without it",
-  "verdict": "No"
-}}
-question: Who wrote 'Romeo and Juliet'?
-{{
-  "reason": "The question is clear and refers to a specific work by name therefore it is clear",
-  "verdict": "Yes"
-}}
-question: What did the study mention?
-{{
-  "reason": "The question is vague and does not specify which study it is referring to",
-  "verdict": "No"
-}}
-question: What is the focus of the REPLUG paper?
-{{
-    "reason": "The question refers to a specific work by it's name hence can be understood", 
-    "verdict": "Yes"
+  "reason": "Вопрос упоминает "статью", не указывая ее названия, что делает его неясным без этой информации.",
+  "verdict": "Нет"
 }}
 
-question: What is the purpose of the reward-driven stage in the training process?
+Вопрос: Кто написал "Ромео и Джульетту"?
 {{
-"reason": "The question lacks specific context regarding the type of training process, making it potentially ambiguous and open to multiple interpretations.",
-"verdict": "No"
+  "reason": "Вопрос ясен и относится к конкретному произведению по его названию, поэтому он понятен.",
+  "verdict": "Да"
 }}
 
+Вопрос: О чем упоминается в исследовании?
+{{
+  "reason": "Вопрос нечеткий и не указывает, на какое исследование он ссылается.",
+  "verdict": "Нет"
+}}
 
-question: {question}"""  # noqa: E501
+Вопрос: В чем заключается фокус работы REPLUG?
+{{
+    "reason": "Вопрос относится к конкретной работе по ее названию, поэтому его можно понять.", 
+    "verdict": "Да"
+}}
+
+Вопрос: Какова цель стадии, ориентированной на вознаграждение, в процессе обучения?
+{{
+"reason": "Вопрос не содержит конкретного контекста относительно типа процесса обучения, что делает его потенциально неоднозначным и открытым для различных интерпретаций.",
+"verdict": "Нет"
+}}
+
+Вопрос: {question}"""  # noqa: E501
 )
 
 EVOLUTION_ELIMINATION = HumanMessagePromptTemplate.from_template(
     """\
-Check if the given two questions are equal based on following requirements:
-1. They have same constraints and requirements.
-2. They have same depth and breadth of the inquiry.
+Проверьте, являются ли предоставленные два вопроса равными, исходя из следующих требований:
 
-Question 1: What are the primary causes of climate change?
-Question 2: What factors contribute to global warming?
+1. Они имеют одинаковые ограничения и требования.
+2. Они имеют одинаковую глубину и широту исследования.
+
+Вопрос 1: Каковы основные причины изменения климата?
+Вопрос 2: Какие факторы способствуют глобальному потеплению?
+
 {{
-  "reason": "While both questions deal with environmental issues, 'climate change' encompasses broader changes than 'global warming', leading to different depths of inquiry.",
-  "verdict": "Not Equal"
+ "reason": "Хотя оба вопроса касаются экологических проблем, 'изменение климата' охватывает более широкий спектр изменений, чем 'глобальное потепление', что приводит к различной глубине исследования.",
+ "verdict": "Не равны"
 }}
-Question 1: How does photosynthesis work in plants?
-Question 2: Can you explain the process of photosynthesis in plants?
+
+Вопрос 1: Как работает фотосинтез у растений?
+Вопрос 2: Можете ли вы объяснить процесс фотосинтеза у растений?
+
 {{
-  "reason": "Both questions ask for an explanation of the photosynthesis process in plants, sharing the same depth, breadth, and requirements for the answer.",
-  "verdict": "Equal"
+ "reason": "Оба вопроса просят объяснить процесс фотосинтеза у растений, имея одинаковую глубину, широту и требования к ответу.",
+ "verdict": "Равны"
 }}
-Question 1: {question1}
-Question 2: {question2}"""  # noqa: E501
+
+Вопрос 1: {question1}
+Вопрос 2: {question2}
+"""  # noqa: E501
 )
 
 ANSWER_FORMULATE = HumanMessagePromptTemplate.from_template(
     """\
-Answer the question using the information from the given context. 
-question:{question}
-context:{context}
-answer:
+Ответьте на вопрос, используя информацию из предоставленного контекста.
+
+вопрос: {question}
+контекст: {context}
+ответ:
 """  # noqa: E501
 )
 
 
 INFORMAL_QUESTION = HumanMessagePromptTemplate.from_template(
     """\
-Rewrite the following question into a casual, conversational form as if it's being asked by someone in an informal setting. 
-Keep the core information request intact, without including any additional details or questions.
-Formal Question: What are the criteria for Objectives and Key Results?
-Casual Rewrite: What should I be looking at when I'm setting up OKRs?
-Formal Question: Could you delineate the primary responsibilities of a project manager?
-Casual Rewrite: What's the main job of a project manager, in simple terms?
-Formal Question: What mechanisms underlie the process of cellular respiration?
-Casual Rewrite: How does cellular respiration actually work?
-Formal Question:{question}
-Casual Rewrite:"""
+Переформулируй следующий вопрос в неформальную, разговорную форму, как если бы его задавали в неформальной обстановке. 
+Сохрани основную информацию запроса, не включая никаких дополнительных деталей или вопросов.
+
+Формальный вопрос: Можете ли вы четко определить основные обязанности руководителя проекта?
+Переформулированный вопрос в неформальной форме: В чем заключается главная работа руководителя проекта, простыми словами?
+
+Формальный вопрос: Какие механизмы лежат в основе процесса клеточного дыхания?
+Переформулированный вопрос в неформальной форме: Как на самом деле работает клеточное дыхание?
+
+Формальный вопрос: {question}
+Переформулированный вопрос в неформальной форме:"""
 )
 
 CONTEXT_FORMULATE = HumanMessagePromptTemplate.from_template(
-    """Please extract relevant sentences from the provided context that can potentially help answer the following question. While extracting candidate sentences you're not allowed to make any changes to sentences from given context.
+    """
+Извлеки соответствующие предложения из предоставленного контекста, которые могут потенциально помочь ответить на следующий вопрос.
+При извлечении предложений-кандидатов вы не вправе вносить изменения в предложения из предоставленного контекста.
 
-question:{question}
-context:\n{context}
+вопрос: {question}
+контекст: \n{context}
+предложения-канддаты: \n
 candidate sentences:\n
 """  # noqa: E501
 )
@@ -344,36 +370,24 @@ candidate sentences:\n
 
 demonstrations = [
     {
-        "context": "The Eiffel Tower in Paris was originally intended as a temporary structure, built for the 1889 World's Fair. It was almost dismantled in 1909 but was saved because it was repurposed as a giant radio antenna.",
+        "context": "Эйфелева башня в Париже изначально задумывалась как временная постройка, построенная для Всемирной выставки 1889 года. Она почти была разобрана в 1909 году, но была спасена, потому что ее переоборудовали в гигантскую радиоантенну.",
         "questions": [
-            {
-                "question_Why": "Why was the Eiffel Tower originally planned to be a temporary structure?"
-            },
-            {
-                "question_Was": "Was the Eiffel Tower originally designed to be a permanent structure?"
-            },
-            {
-                "question_What": "What was the original purpose of the Eiffel Tower when it was built for the 1889 World's Fair?"
-            },
-            {
-                "question_How": "How did the Eiffel Tower avoid being dismantled in 1909?"
-            },
-            {"question_Where": "Where is the Eiffel Tower?"},
+            {"question_Why": "Почему Эйфелева башня изначально планировалась как временная постройка?"},
+            {"question_Was": "Была ли Эйфелева башня изначально задумана как постоянная постройка?"},
+            {"question_What": "Какова была первоначальная цель Эйфелевой башни, когда она была построена для Всемирной выставки 1889 года?"},
+            {"question_How": "Как Эйфелева башня избежала разборки в 1909 году?"},
+            {"question_Where" "Где находится Эйфелева башня?"},
         ],
     },
     {
-        "context": "Photosynthesis is a process used by plants, algae, and certain bacteria to convert light energy into chemical energy.",
+        "context": "Фотосинтез — это процесс, используемый растениями, водорослями и определенными бактериями для преобразования световой энергии в химическую энергию.",
         "questions": [
-            {"question_Why": "Why do plants perform photosynthesis?"},
-            {
-                "question_Was": "Was photosynthesis discovered in plants, algae, or bacteria first?"
-            },
-            {
-                "question_What": "What converts light energy into chemical energy in photosynthesis?"
-            },
-            {"question_How": "How do plants capture light energy for photosynthesis?"},
-            {"question_Where": "Where in plants does photosynthesis primarily occur?"},
-            {"question_Can": "Can photosynthesis occur in the absence of light?"},
+            {"question_Why": "Почему растения осуществляют фотосинтез?"},
+            {"question_Was": "Был ли фотосинтез впервые открыт у растений, водорослей или бактерий?"},
+            {"question_What": "Что преобразует световую энергию в химическую энергию в процессе фотосинтеза?"},
+            {"question_How": "Как растения захватывают световую энергию для фотосинтеза?"},
+            {"question_Where": "Где в растениях фотосинтез происходит в основном?"},
+            {"question_Can": "Может ли фотосинтез происходить в отсутствие света?"},
         ],
     },
 ]
